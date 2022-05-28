@@ -1,12 +1,21 @@
 import db from '../db.js';
 
 export async function getCustomers(req, res) {
+    const {cpf} = req.query;
     try{
-        const customers = await db.query(`
-            SELECT *
-            FROM customers
-        `);
-        res.send(customers.rows);
+        if (cpf) {
+            const customers = await db.query(`
+            SELECT * FROM customers 
+            WHERE cpf ILIKE $1
+        `, [`${cpf}%`]);
+            res.send(customers.rows);
+        }else{
+            const customers = await db.query(`
+                SELECT *
+                FROM customers
+            `);
+            res.send(customers.rows);
+        }
     }catch(err){
         console.log(err);
         res.sendStatus(500);

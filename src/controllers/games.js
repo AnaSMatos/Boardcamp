@@ -5,15 +5,19 @@ export async function getGames(req, res) {
     try{
         if(name){
             const games = await db.query(`
-                SELECT * FROM games
-                WHERE name ILIKE $1
+            SELECT games.*,
+            categories.name as "categoryName" 
+            FROM games JOIN categories ON games."categoryId" = categories.id 
+            WHERE games.name ILIKE $1
             `, [`${name}%`]);
             return res.send(games.rows);
         }else{
             const games = await db.query(`
-                SELECT *
-                FROM games
+            SELECT games.*, 
+            categories.name as "categoryName", 
+            categories.name FROM games JOIN categories ON games."categoryId"=categories.id
             `);
+        
             res.send(games.rows);
         }
     }catch(err){
