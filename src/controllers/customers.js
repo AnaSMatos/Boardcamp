@@ -1,18 +1,29 @@
 import db from '../db.js';
 
 export async function getCustomers(req, res) {
-    const {id} = req.params;
-    if(id){
-        console.log(id);
-    }else{
-        console.log('no id');
-    }
     try{
         const customers = await db.query(`
             SELECT *
             FROM customers
         `);
         res.send(customers.rows);
+    }catch(err){
+        console.log(err);
+        res.sendStatus(500);
+    }
+}
+
+export async function getCustomer(req, res){
+    const {id} = req.params;
+    try{
+        const customer = await db.query(`
+            SELECT *
+            FROM customers
+            WHERE id = $1`, [id]);
+        if(customer.rows.length === 0){
+            return res.sendStatus(404);
+        }
+        res.send(customer.rows[0]);
     }catch(err){
         console.log(err);
         res.sendStatus(500);

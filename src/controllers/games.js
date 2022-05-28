@@ -1,12 +1,21 @@
 import db from '../db.js';
 
 export async function getGames(req, res) {
+    const {name} = req.query;
     try{
-        const games = await db.query(`
-            SELECT *
-            FROM games
-        `);
-        res.send(games.rows);
+        if(name){
+            const games = await db.query(`
+                SELECT * FROM games
+                WHERE name ILIKE $1
+            `, [`${name}%`]);
+            return res.send(games.rows);
+        }else{
+            const games = await db.query(`
+                SELECT *
+                FROM games
+            `);
+            res.send(games.rows);
+        }
     }catch(err){
         console.log(err);
         res.sendStatus(500);
@@ -26,3 +35,4 @@ export async function postGame(req, res) {
         res.sendStatus(500);
     }
 }
+
